@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  workout-tracker-app:
+    container_name: workout-tracker-app
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - workout-tracker-postgres
+    environment:
+      - ConnectionStrings:DefaultConnection=Host=workout-tracker-postgres:5432;Database=workout-tracker;Username=postgres;Password=postgres
+  
+  workout-tracker-postgres:
+    container_name: workout-tracker-postgres
+    image: "postgres:15.2-bullseye"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      # external:internal
+      - "5445:5432"
+    volumes:
+      - workout-tracker-postgres-volume:/var/lib/postgresql/data
+
+volumes:
+  workout-tracker-postgres-volume:
